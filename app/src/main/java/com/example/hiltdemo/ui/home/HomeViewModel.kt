@@ -29,19 +29,23 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getNowShowingMovie(page).let {response ->
                 if(response.isSuccessful){
-                    responseBody.postValue(response.body())
-                    response.body().let {
-                        it!!.results.forEach {
-                            val movie = MovieList(
-                                id = it.id,
-                                original_title = it.original_title,
-                                overview = it.overview,
-                                title = it.title,
-                                vote_average = it.vote_average)
+                    try {
+                        repository.deleteMovie()
+                        responseBody.postValue(response.body())
+                        response.body().let {
+                            it!!.results.forEach {
+                                val movie = MovieList(
+                                    id = it.id,
+                                    original_title = it.original_title,
+                                    overview = it.overview,
+                                    title = it.title,
+                                    vote_average = it.vote_average)
 
-                            repository.insertMovie(movie)
+                                repository.insertMovie(movie)
+                            }
                         }
-                    }
+                    }catch (e : Exception){}
+
 
                 }else{
                     Log.e("hello", "getAllData: hello" )

@@ -16,4 +16,8 @@ class MainRepository @Inject constructor(
     suspend fun insertMovie(movieList: MovieList){
         dao.insertMovie(movieList)
     }
+
+    suspend fun deleteMovie(){
+        dao.deleteMovie()
+    }
 }

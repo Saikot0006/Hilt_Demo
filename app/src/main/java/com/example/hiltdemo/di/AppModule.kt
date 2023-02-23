@@ -25,7 +25,7 @@ import javax.inject.Singleton
 object AppModule {
 
     @Provides
-    fun provideBaseUrl() = AppConstant.BASE_URL_WEATHER
+    fun provideBaseUrl() = AppConstant.BASE_URL
 
     @Provides
     fun createOkHttpClient() : OkHttpClient{

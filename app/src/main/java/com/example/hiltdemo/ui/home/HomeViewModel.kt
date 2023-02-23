@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hiltdemo.dao.MovieDao
+import com.example.hiltdemo.modal.MovieList
 import com.example.hiltdemo.modal.NowShowingMovieModel
 import com.example.hiltdemo.repository.MainRepository
 import dagger.hilt.android.HiltAndroidApp
@@ -16,7 +18,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val repository: MainRepository)
+class HomeViewModel @Inject constructor(
+    private val dao: MovieDao,
+    private val repository: MainRepository)
     : ViewModel(){
 
     val responseBody = MutableLiveData<NowShowingMovieModel>()
@@ -26,6 +30,19 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository)
             repository.getNowShowingMovie(page).let {response ->
                 if(response.isSuccessful){
                     responseBody.postValue(response.body())
+                    response.body().let {
+                        it!!.results.forEach {
+                            val movie = MovieList(
+                                id = it.id,
+                                original_title = it.original_title,
+                                overview = it.overview,
+                                title = it.title,
+                                vote_average = it.vote_average)
+
+                            repository.insertMovie(movie)
+                        }
+                    }
+
                 }else{
                     Log.e("hello", "getAllData: hello" )
                 }
@@ -34,6 +51,7 @@ class HomeViewModel @Inject constructor(private val repository: MainRepository)
 
         return responseBody
     }
+
 
 
 

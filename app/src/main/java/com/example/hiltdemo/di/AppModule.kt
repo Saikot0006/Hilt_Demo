@@ -1,7 +1,10 @@
 package com.example.hiltdemo.di
 
+import android.app.Application
 import com.example.hiltdemo.BuildConfig
 import com.example.hiltdemo.api.MovieApi
+import com.example.hiltdemo.dao.MovieDao
+import com.example.hiltdemo.db.Database
 import com.example.hiltdemo.utils.AppConstant
 import com.localebro.okhttpprofiler.OkHttpProfilerInterceptor
 import dagger.Module
@@ -41,6 +44,17 @@ object AppModule {
             .client(httpClient)
             .build()
             .create(MovieApi::class.java)
+    @Provides
+    @Singleton
+    fun getDatabase(application: Application) : Database{
+        return Database.getDB(application)
+    }
+
+    @Provides
+    @Singleton
+    fun getDao(database: Database) : MovieDao{
+        return database.getDao()
+    }
 
 
 }

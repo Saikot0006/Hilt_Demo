@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.hiltdemo.databinding.FragmentHomeBinding
+import com.example.hiltdemo.modal.MovieList
 import com.example.hiltdemo.work_manager.MovieWorker
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,10 +46,15 @@ class HomeFragment : Fragment() {
                 if (it.state.isFinished) {
                     viewModel.getNowShowingMovie(1)
                         .observe(requireActivity()) {
-                            it.results.forEach {
+                            it!!.results.forEach {
+                                val movie = MovieList(
+                                    id = it.id,
+                                    original_title = it.original_title,
+                                    overview = it.overview,
+                                    title = it.title,
+                                    vote_average = it.vote_average)
 
-                                //val data = Data.Builder().putString("movie",movie)
-                                Log.e("original_title", "onCreateView: " + it.original_title)
+                                viewModel.insertMovie(movie)
                             }
                         }
                 }

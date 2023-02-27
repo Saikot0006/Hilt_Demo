@@ -23,20 +23,8 @@ class HomeViewModel @Inject constructor(
             repository.getNowShowingMovie(page).let {response ->
                 if(response.isSuccessful){
                     try {
-                        repository.deleteMovie()
+                        //repository.deleteMovie()
                         responseBody.postValue(response.body())
-                        response.body().let {
-                            it!!.results.forEach {
-                                val movie = MovieList(
-                                    id = it.id,
-                                    original_title = it.original_title,
-                                    overview = it.overview,
-                                    title = it.title,
-                                    vote_average = it.vote_average)
-
-                                repository.insertMovie(movie)
-                            }
-                        }
                     }catch (e : Exception){
                         Log.e("error", "getNowShowingMovie: "+e.localizedMessage )
                     }
@@ -49,6 +37,18 @@ class HomeViewModel @Inject constructor(
         }
 
         return responseBody
+    }
+
+     fun insertMovie(movieList: MovieList){
+         viewModelScope.launch {
+             try {
+                 repository.insertMovie(movieList)
+             }catch (e:Exception){
+                 Log.e("error", "insertMovie: "+e.localizedMessage )
+             }
+
+         }
+
     }
 
 

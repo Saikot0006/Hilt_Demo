@@ -5,8 +5,8 @@ import com.example.hiltdemo.BuildConfig
 import com.example.hiltdemo.api.MovieApi
 import com.example.hiltdemo.dao.MovieDao
 import com.example.hiltdemo.db.Database
+import com.example.hiltdemo.repository.MainRepository
 import com.example.hiltdemo.utils.AppConstant
-import com.example.hiltdemo.work_manager.WorkerDependency
 import com.localebro.okhttpprofiler.OkHttpProfilerInterceptor
 import dagger.Module
 import dagger.Provides
@@ -54,12 +54,13 @@ object AppModule {
         return database.getDao()
     }
 
-
-    @Singleton
     @Provides
-    fun provideWorker() : WorkerDependency{
-        return WorkerDependency()
+    fun provideMainRepository(dao: MovieDao,movieApi: MovieApi) :
+            MainRepository {
+
+        return MainRepository(dao,movieApi)
     }
+
 
 
 }

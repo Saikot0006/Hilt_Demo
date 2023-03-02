@@ -5,8 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.hiltdemo.databinding.FragmentHomeBinding
@@ -18,6 +21,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding : FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+    var i : Int =1
+    lateinit var request : OneTimeWorkRequest
+    lateinit var data : Data
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -25,40 +31,35 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater,container,false)
 
-        val request = OneTimeWorkRequestBuilder<MovieWorker>().build()
+        data = Data.Builder().putInt("input_data",i).build()
+
+        request = OneTimeWorkRequestBuilder<MovieWorker>()
+            .setInputData(data)
+            .build()
+
 
         WorkManager.getInstance(requireContext()).enqueue(request)
 
-       /* WorkManager.getInstance(requireActivity().applicationContext)
-            .getWorkInfoByIdLiveData(request.id).observe(requireActivity()) {
-                Log.e("hello", "onCreateView: hello09"+it.id )
-                *//*viewModel.getNowShowingMovie(1)
-                    .observe(requireActivity()){
-                    it.results.forEach {
-                        Log.e("original_title", "onCreateView: "+it.original_title )
-                    }
-                }*//*
-
-            }*/
-
-        WorkManager.getInstance(requireContext())
-            .getWorkInfoByIdLiveData(request.id).observe(requireActivity()) {
-                if (it.state.isFinished) {
-                    viewModel.getNowShowingMovie(1)
-                        .observe(requireActivity()) {
-                            it!!.results.forEach {
-                                val movie = MovieList(
-                                    id = it.id,
-                                    original_title = it.original_title,
-                                    overview = it.overview,
-                                    title = it.title,
-                                    vote_average = it.vote_average)
-
-                                viewModel.insertMovie(movie)
-                            }
-                        }
-                }
+        viewModel.getNowShowingMovie(i).observe(requireActivity()){
+            it.results.forEach {
+                Log.e("TAG", "onCreateView: "+it.original_title)
             }
+        }
+
+        binding.btnID.setOnClickListener {
+            i = i+1
+            Log.e("value1", "onCreateView: "+i)
+            viewModel.getNowShowingMovie(i)
+            data = Data.Builder().putInt("input_data",i).build()
+
+            request = OneTimeWorkRequestBuilder<MovieWorker>()
+                .setInputData(data)
+                .build()
+
+            WorkManager.getInstance(requireContext()).enqueue(request)
+
+
+        }
 
 
         return binding.root

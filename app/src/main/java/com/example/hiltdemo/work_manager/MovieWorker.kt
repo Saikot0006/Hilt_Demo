@@ -3,6 +3,7 @@ package com.example.hiltdemo.work_manager
 import android.content.Context
 import android.util.Log
 import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -19,17 +20,14 @@ class MovieWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val mainRepository: MainRepository
 
-) : Worker(context, workerParams) {
-    override fun doWork(): Result {
+) : CoroutineWorker(context, workerParams) {
+    override suspend fun doWork(): Result {
         Log.e("work", "doWork: work start!!" )
         var data : Data = inputData
         var value : Int = data.getInt("input_data",1)
         Log.e("value", "doWork: "+value )
 
-        GlobalScope.launch {
-            Log.e("work", "doWor0: work start!!" )
-            getNowShowingMovie(value)
-        }
+        getNowShowingMovie(value)
 
         return Result.success()
     }
